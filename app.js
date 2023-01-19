@@ -31,9 +31,9 @@ const routes = require("./routes");
 app.use("/api/auth", routes.auth);
 
 app.use(
-  "/api/explore",
+  "/api/activity",
   passport.authenticate("jwt", { session: false }),
-  routes.explore
+  routes.activity
 );
 
 // mongoose資料庫
