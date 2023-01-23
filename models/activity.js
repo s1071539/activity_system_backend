@@ -6,7 +6,7 @@ const activitySchema = new mongoose.Schema({
     required: true,
   },
   object: {
-    type: String,
+    type: [String],
     required: true,
   },
   location: {
@@ -26,8 +26,8 @@ const activitySchema = new mongoose.Schema({
     required: true,
   },
   manager: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    type: String,
+    require: true,
   },
   manager_contact: {
     type: String,

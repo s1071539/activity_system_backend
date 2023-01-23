@@ -30,11 +30,13 @@ app.use(cors());
 const routes = require("./routes");
 app.use("/api/auth", routes.auth);
 
-app.use(
-  "/api/activity",
-  passport.authenticate("jwt", { session: false }),
-  routes.activity
-);
+// app.use(
+//   "/api/activity",
+//   passport.authenticate("jwt", { session: false }),
+//   routes.activity
+// );
+
+app.use("/api/activity", routes.activity);
 
 // mongoose資料庫
 mongoose.set("strictQuery", false);

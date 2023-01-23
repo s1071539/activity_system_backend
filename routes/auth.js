@@ -11,6 +11,17 @@ router.get("/testAPI", (req, res) => {
   return res.status(200).json(msgObj);
 });
 
+router.post("/upload", (req, res) => {
+  const msgObj = {
+    name: "xxx.png",
+    status: "done",
+    url: "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
+    thumbUrl:
+      "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
+  };
+  return res.status(200).json(msgObj);
+});
+
 // POST api/auth/signup
 router.post("/signup", async (req, res) => {
   const reqData = req.body.formData;
