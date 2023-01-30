@@ -7,6 +7,8 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
+const userModel = require("./models").userModel;
+
 require("dotenv").config();
 
 const passport = require("passport");
@@ -30,13 +32,24 @@ app.use(cors());
 const routes = require("./routes");
 app.use("/api/auth", routes.auth);
 
-// app.use(
-//   "/api/activity",
-//   passport.authenticate("jwt", { session: false }),
-//   routes.activity
-// );
+app.use(
+  "/api/activity",
+  passport.authenticate("jwt", { session: false }),
+  routes.activity
+);
 
-app.use("/api/activity", routes.activity);
+app.use(
+  "/api/user",
+  passport.authenticate("jwt", { session: false }),
+  routes.user
+);
+
+// app.use("/api/activity", routes.activity);
+
+// 測試用
+app.get("/trial", function (req, res) {
+  res.send("hello world");
+});
 
 // mongoose資料庫
 mongoose.set("strictQuery", false);

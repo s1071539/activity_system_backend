@@ -18,7 +18,21 @@ const userSchema = new mongoose.Schema({
     minLength: 6,
     maxLength: 1024,
   },
-  date: {
+  enrolledActivity: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "Activity",
+    default: [],
+  },
+  likedActivity: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "Activity",
+    default: [],
+  },
+  identity: {
+    type: Array,
+    default: [],
+  },
+  createDate: {
     type: Date,
     default: Date.now,
   },

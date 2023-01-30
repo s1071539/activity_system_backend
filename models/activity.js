@@ -45,10 +45,23 @@ const activitySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  id: String,
-  like: Boolean,
-  watch: Number,
-  enrollment: Number,
+  watch: {
+    type: Number,
+    default: 0,
+  },
+  enrollment: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: "User",
+    default: [],
+  },
+  createTime: {
+    type: Date,
+    default: Date.now,
+  },
+  updateTime: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 module.exports = mongoose.model("Activity", activitySchema);

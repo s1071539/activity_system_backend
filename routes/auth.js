@@ -34,11 +34,11 @@ router.post("/signup", async (req, res) => {
     password: reqData.password,
   });
   try {
-    const savedUser = await newUser.save();
-    res.status(200).send({
-      msg: "註冊成功！",
-      savedObject: savedUser,
-    });
+    const user = await newUser.save();
+
+    const tokenObject = { _id: user._id, email: user.email };
+    const token = jwt.sign(tokenObject, process.env.PASSPORT_SECRET);
+    res.status(200).send({ msg: "註冊成功！", token: "JWT " + token, user });
   } catch (err) {
     res.status(400).send(err.message);
   }
