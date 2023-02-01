@@ -9,62 +9,98 @@ router.get("/explore", async (req, res) => {
     .then((activity) => {
       res.status(200).send(activity);
     })
-    .catch(() => {
-      res.status(500).send("Error!! Cannot get course!!");
+    .catch((err) => {
+      res.status(500).send({
+        message: "伺服器內部錯誤!",
+        state: "error",
+        error: err.message,
+      });
     });
 });
 
 // POST api/activity/create
 router.post("/create", async (req, res) => {
-  let { formData } = req.body;
-
   try {
+    let { formData } = req.body;
+
     // 驗證表單參數
-    if (!formData) return res.status(400).send("未接收到表單資料！");
-
+    if (!formData)
+      return res.status(400).send({
+        message: "未接收到表單資料！",
+        state: "error",
+        error: "未接收到表單資料！",
+      });
     const { error } = createActivityValidation(formData);
+    if (error) {
+      return res.status(400).send({
+        message: error.details[0].message,
+        state: "warning",
+        error: error,
+      });
+    }
 
-    if (error) return res.status(400).send(error.details[0].message);
-  } catch (err) {
-    res.status(500).send("伺服器錯誤，新活動建立失敗！");
-  }
+    // 驗證標題重複
+    let activity = await Activity.findOne({ title: formData.title });
+    if (activity) {
+      return res.status(400).send({
+        message: "此活動標題已被使用!",
+        state: "warning",
+        error: "此活動標題已被使用!",
+      });
+    }
 
-  try {
     let newActivity = new Activity(formData);
     await newActivity.save();
     res.status(200).send("新活動建立成功！");
   } catch (err) {
-    res.status(500).send("伺服器錯誤，新活動建立失敗！");
+    res.status(500).send({
+      message: "伺服器錯誤，新活動建立失敗!",
+      state: "error",
+      error: err,
+    });
   }
 });
 
 // POST api/activity/enroll/:activity_id
 router.post("/enroll/:activity_id", async (req, res) => {
-  let { activity_id } = req.params;
-  let { user_id } = req.body;
   try {
+    let { activity_id } = req.params;
+    let { user_id } = req.body;
     let activity = await Activity.findOne({ _id: activity_id });
     if (activity.enrollment.includes(user_id)) {
-      return res.status(400).send("You have already signed up for this event!");
+      return res.status(400).send({
+        message: "你已經報名過此活動!",
+        state: "warning",
+        error: "你已經報名過此活動!",
+      });
     }
     activity.enrollment.push(user_id);
     await activity.save();
     res.status(200).send("Done Enrollment.");
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send({
+      message: "伺服器錯誤，參加建立失敗!",
+      state: "error",
+      error: err.message,
+    });
   }
 });
 
 // POST api/activity/enroll/:_id
 router.post("/watch/:activity_id", async (req, res) => {
-  let { activity_id } = req.params;
   try {
+    let { activity_id } = req.params;
+
     let activity = await Activity.findOne({ _id: activity_id });
     activity.watch += 1;
     await activity.save();
     res.status(200).send("watch added!");
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).send({
+      message: "伺服器錯誤，參加建立失敗!",
+      state: "error",
+      error: err.message,
+    });
   }
 });
 

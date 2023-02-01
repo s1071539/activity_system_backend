@@ -15,9 +15,8 @@ router.post("/upload", (req, res) => {
   const msgObj = {
     name: "xxx.png",
     status: "done",
-    url: "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
-    thumbUrl:
-      "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
+    url: "",
+    thumbUrl: "",
   };
   return res.status(200).json(msgObj);
 });

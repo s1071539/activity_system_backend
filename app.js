@@ -34,7 +34,10 @@ app.use("/api/auth", routes.auth);
 
 app.use(
   "/api/activity",
-  passport.authenticate("jwt", { session: false }),
+  passport.authenticate("jwt", {
+    session: false,
+    failureFlash: "Invalid username or  password.",
+  }),
   routes.activity
 );
 
@@ -44,7 +47,11 @@ app.use(
   routes.user
 );
 
-// app.use("/api/activity", routes.activity);
+app.use(
+  "/api/group",
+  passport.authenticate("jwt", { session: false }),
+  routes.group
+);
 
 // 測試用
 app.get("/trial", function (req, res) {
