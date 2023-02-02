@@ -11,6 +11,7 @@ router.get("/testAPI", (req, res) => {
   return res.status(200).json(msgObj);
 });
 
+// POST api/auth/upload
 router.post("/upload", (req, res) => {
   const msgObj = {
     name: "xxx.png",
