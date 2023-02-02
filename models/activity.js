@@ -54,6 +54,11 @@ const activitySchema = new mongoose.Schema({
     ref: "User",
     default: [],
   },
+  creator: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   createTime: {
     type: Date,
     default: Date.now,

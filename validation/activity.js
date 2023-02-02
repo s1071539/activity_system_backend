@@ -40,6 +40,7 @@ const createActivityValidation = (data) => {
     quota: Joi.number().min(1).required().messages(myJoiMessage),
     activity_imgs: Joi.array().items(Joi.string()).messages(myJoiMessage),
     description: Joi.string().required().messages(myJoiMessage),
+    creator: Joi.string().required().messages(myJoiMessage),
   });
 
   return schema.validate(data);

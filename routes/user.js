@@ -6,7 +6,9 @@ router.get("/:user_id", (req, res) => {
   try {
     let { user_id } = req.params;
 
-    return User.find({ _id: user_id })
+    return User.findOne({ _id: user_id })
+      .populate("likedActivity", ["_id", "title"])
+      .populate("enrolledActivity", ["_id", "title"])
       .then((user) => {
         res.status(200).send(user);
       })
@@ -22,8 +24,8 @@ router.get("/:user_id", (req, res) => {
   }
 });
 
-// GET api/user/like/:activity_id
-router.post("/like/:activity_id", async (req, res) => {
+// POST api/user/likeActivity/:activity_id
+router.post("/likeActivity/:activity_id", async (req, res) => {
   try {
     let { activity_id } = req.params;
     let { user_id } = req.body;
@@ -42,5 +44,4 @@ router.post("/like/:activity_id", async (req, res) => {
     });
   }
 });
-
 module.exports = router;
