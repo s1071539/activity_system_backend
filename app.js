@@ -33,11 +33,16 @@ const routes = require("./routes");
 app.use("/api/auth", routes.auth);
 
 app.use(
+  "/api/auth_session",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    res.status(200).send("授權成功！");
+  }
+);
+
+app.use(
   "/api/activity",
-  passport.authenticate("jwt", {
-    session: false,
-    failureFlash: "Invalid username or  password.",
-  }),
+  passport.authenticate("jwt", { session: false }),
   routes.activity
 );
 

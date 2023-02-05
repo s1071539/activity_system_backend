@@ -97,6 +97,47 @@ router.post("/enroll/:activity_id", async (req, res) => {
   }
 });
 
+// POST api/activity/cancel/:activity_id
+router.post("/cancel/:activity_id", async (req, res) => {
+  try {
+    let { activity_id } = req.params;
+    let { user_id } = req.body;
+    let activity = await Activity.findOne({ _id: activity_id });
+    let user = await User.findOne({ _id: user_id });
+
+    let userid_index = -1;
+    let activityid_index = -1;
+
+    for (let i in activity.enrollment)
+      if (activity.enrollment[i] == user_id) userid_index = i;
+
+    for (let i in user.enrolledActivity)
+      if (user.enrolledActivity[i] == activity_id) activityid_index = i;
+
+    if (userid_index === -1 && activityid_index === -1) {
+      return res.status(400).send({
+        message: "你不再此活動中!",
+        state: "error",
+        error: "你不再此活動中!",
+      });
+    }
+
+    if (userid_index != -1) activity.enrollment.splice(userid_index, 1);
+    if (activityid_index != -1)
+      user.enrolledActivity.splice(activityid_index, 1);
+
+    await activity.save();
+    await user.save();
+    res.status(200).send("取消成功!");
+  } catch (err) {
+    res.status(500).send({
+      message: "伺服器錯誤，取消失敗!",
+      state: "error",
+      error: err.message,
+    });
+  }
+});
+
 // POST api/activity/enroll/:_id
 router.post("/watch/:activity_id", async (req, res) => {
   try {
