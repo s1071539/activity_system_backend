@@ -4,6 +4,10 @@ const User = require("../models").userModel;
 const createActivityValidation =
   require("../validation/activity").createActivityValidation;
 
+function checkDataValidation(formData) {
+  // 檢查資料格式, 空白, 重複, 可動
+}
+
 // GET api/activity/explore
 router.get("/explore", async (req, res) => {
   Activity.find({})
@@ -149,7 +153,32 @@ router.post("/watch/:activity_id", async (req, res) => {
     res.status(200).send("watch added!");
   } catch (err) {
     res.status(500).send({
-      message: "伺服器錯誤，參加建立失敗!",
+      message: "伺服器錯誤，增加觀看失敗!",
+      state: "error",
+      error: err.message,
+    });
+  }
+});
+
+// PATCH api/activity/edit/:_id
+router.patch("/edit/:activity_id", async (req, res) => {
+  try {
+    let { activity_id } = req.params;
+    let { formData } = req.body;
+
+    let activity = await Activity.findOne({ _id: activity_id });
+
+    for (let key in formData) {
+      if (formData[key] !== undefined && activity[key] !== undefined) {
+        activity[key] = formData[key];
+      }
+    }
+
+    await activity.save();
+    res.status(200).send("edit done!");
+  } catch (err) {
+    res.status(500).send({
+      message: "伺服器錯誤，修改活動失敗!",
       state: "error",
       error: err.message,
     });
