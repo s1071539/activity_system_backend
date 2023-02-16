@@ -60,6 +60,18 @@ router.post("/create", async (req, res) => {
       });
     }
 
+    const storage = multer.diskStorage({
+      destination: (req, file, cb) => {
+        cb(null, "uploads/");
+      },
+      filename: (req, file, cb) => {
+        cb(null, file.fieldname + "-" + Date.now());
+      },
+    });
+    const upload = multer({ storage: storage });
+
+    upload.single("file");
+
     let newActivity = new Activity(activityData);
     await newActivity.save();
     res.status(200).send("新活動建立成功！");
