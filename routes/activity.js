@@ -4,6 +4,9 @@ const User = require("../models").userModel;
 const createActivityValidation =
   require("../validation/activity").createActivityValidation;
 
+const multer = require("multer");
+const fs = require("fs");
+
 function checkDataValidation(formData) {
   // 檢查資料格式, 空白, 重複, 可動
 }
@@ -25,21 +28,19 @@ router.get("/explore", async (req, res) => {
 });
 
 // POST api/activity/create
-router.post("/create", async (req, res) => {
+const upload = multer({ dest: "uploads/" });
+router.post("/create", upload.array("files"), async (req, res) => {
   try {
-    let { formData, user_id } = req.body;
+    let formData = req.body;
 
-    // 驗證表單參數
-    if (!formData)
-      return res.status(400).send({
-        message: "未接收到表單資料！",
-        state: "error",
-        error: "未接收到表單資料！",
-      });
+    // parse原本stringify的formData
+    for (let i in formData) {
+      formData[i] = JSON.parse(formData[i]);
+    }
 
     let activityData = {
       ...formData,
-      ...{ creator: user_id },
+      ...{ creator: req.user.id },
     };
     const { error } = createActivityValidation(activityData);
     if (error) {
@@ -53,6 +54,7 @@ router.post("/create", async (req, res) => {
     // 驗證標題重複
     let activity = await Activity.findOne({ title: activityData.title });
     if (activity) {
+      throw "qwe";
       return res.status(400).send({
         message: "此活動標題已被使用!",
         state: "warning",
@@ -60,21 +62,25 @@ router.post("/create", async (req, res) => {
       });
     }
 
-    const storage = multer.diskStorage({
-      destination: (req, file, cb) => {
-        cb(null, "uploads/");
-      },
-      filename: (req, file, cb) => {
-        cb(null, file.fieldname + "-" + Date.now());
-      },
-    });
-    const upload = multer({ storage: storage });
-
-    upload.single("file");
-
     let newActivity = new Activity(activityData);
+
     await newActivity.save();
-    res.status(200).send("新活動建立成功！");
+
+    let newDir = "uploads/" + newActivity._id;
+
+    await fs.mkdir(newDir, { recursive: true }, (err) => {
+      if (err) {
+        console.error(err);
+      } else {
+        for (let uploadedFile of req.files) {
+          let newPath = `${newDir}/${uploadedFile.filename}.jpg`;
+          fs.rename(uploadedFile.path, newPath, () => {
+            return;
+          });
+        }
+        res.status(200).send("新活動建立成功！");
+      }
+    });
   } catch (err) {
     res.status(500).send({
       message: "伺服器錯誤，新活動建立失敗!",

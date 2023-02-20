@@ -66,30 +66,6 @@ app.get("/trial", function (req, res) {
   res.send("hello world");
 });
 
-// const upload = multer({ dest: "uploads/" });
-
-// app.post("/server/upload", upload.single("file"), (req, res) => {
-//   /* 直接儲存 */
-//   res.json({ file: req.file });
-
-//   /* 改名 */
-//   // let newPath = `uploads/${req.file.originalname}`;
-//   // fs.rename(req.file.path, newPath, () => {
-//   //   res.json({ result: "image uploaded successful" });
-//   // });
-
-//   // const file = req.file;
-//   // const fileContents = file.buffer;
-
-//   // zlib.gzip(fileContents, (err, result) => {
-//   //   if (err) {
-//   //     return res.status(500).send(err);
-//   //   }
-//   //   res.json({ result: result });
-//   // });
-
-// });
-
 // mongoose資料庫
 mongoose.set("strictQuery", false);
 
