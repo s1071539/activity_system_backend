@@ -15,8 +15,8 @@ function checkDataValidation(formData) {
 router.get("/explore", async (req, res) => {
   Activity.find({})
     .populate("creator", ["_id", "username"])
-    .then((activity) => {
-      res.status(200).send(activity);
+    .then((activities) => {
+      res.status(200).send(activities);
     })
     .catch((err) => {
       res.status(500).send({
@@ -28,7 +28,15 @@ router.get("/explore", async (req, res) => {
 });
 
 // POST api/activity/create
-const upload = multer({ dest: "uploads/" });
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + "-" + Date.now());
+  },
+});
+var upload = multer({ storage: storage });
 router.post("/create", upload.array("files"), async (req, res) => {
   try {
     let formData = req.body;
@@ -38,10 +46,13 @@ router.post("/create", upload.array("files"), async (req, res) => {
       formData[i] = JSON.parse(formData[i]);
     }
 
+    // 將建立者加到資料中
     let activityData = {
       ...formData,
       ...{ creator: req.user.id },
     };
+
+    // 驗證資料合法性
     const { error } = createActivityValidation(activityData);
     if (error) {
       return res.status(400).send({
@@ -54,39 +65,38 @@ router.post("/create", upload.array("files"), async (req, res) => {
     // 驗證標題重複
     let activity = await Activity.findOne({ title: activityData.title });
     if (activity) {
-      throw "qwe";
-      return res.status(400).send({
+      throw {
+        expected: true,
         message: "此活動標題已被使用!",
         state: "warning",
         error: "此活動標題已被使用!",
-      });
+      };
     }
 
-    let newActivity = new Activity(activityData);
+    // 將上傳圖片轉成base64編碼
+    // 參考https://ithelp.ithome.com.tw/articles/10231435
+    activityData["activity_imgs"] = [];
+    for (let file of req.files) {
+      let img = fs.readFileSync(file.path);
+      let encode_image = img.toString("base64");
+      activityData["activity_imgs"].push(encode_image);
+    }
 
+    // 儲存至mongoose
+    let newActivity = new Activity(activityData);
     await newActivity.save();
 
-    let newDir = "uploads/" + newActivity._id;
-
-    await fs.mkdir(newDir, { recursive: true }, (err) => {
-      if (err) {
-        console.error(err);
-      } else {
-        for (let uploadedFile of req.files) {
-          let newPath = `${newDir}/${uploadedFile.filename}.jpg`;
-          fs.rename(uploadedFile.path, newPath, () => {
-            return;
-          });
-        }
-        res.status(200).send("新活動建立成功！");
-      }
-    });
+    return res.status(200).send("新活動建立成功");
   } catch (err) {
-    res.status(500).send({
-      message: "伺服器錯誤，新活動建立失敗!",
-      state: "error",
-      error: err,
-    });
+    if (err.expected) {
+      return res.status(500).send(err);
+    } else {
+      return res.status(500).send({
+        message: "伺服器錯誤，新活動建立失敗!",
+        state: "error",
+        error: err,
+      });
+    }
   }
 });
 
