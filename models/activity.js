@@ -38,8 +38,8 @@ const activitySchema = new mongoose.Schema({
     required: true,
   },
   activity_imgs: {
-    type: Array,
-    required: true,
+    type: [String],
+    required: false,
   },
   description: {
     type: String,
