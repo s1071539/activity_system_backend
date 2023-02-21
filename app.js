@@ -6,11 +6,6 @@ var logger = require("morgan");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const multer = require("multer");
-const fs = require("fs");
-const zlib = require("zlib");
-
-const userModel = require("./models").userModel;
 
 require("dotenv").config();
 
