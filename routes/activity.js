@@ -205,4 +205,19 @@ router.patch("/edit/:activity_id", async (req, res) => {
   }
 });
 
+router.post("/delete/:activity_id", async (req, res) => {
+  let { activity_id } = req.params;
+  Activity.findByIdAndRemove(activity_id, (err, example) => {
+    if (err) {
+      res.status(500).send({
+        message: "伺服器錯誤，刪除活動失敗!",
+        state: "error",
+        error: err.message,
+      });
+    } else {
+      res.status(200).send("delete done!");
+    }
+  });
+});
+
 module.exports = router;
