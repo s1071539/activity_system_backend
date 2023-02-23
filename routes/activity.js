@@ -28,11 +28,7 @@ router.get("/explore", async (req, res) => {
 });
 
 // POST api/activity/create
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "public");
-  },
-});
+const storage = multer.memoryStorage();
 var upload = multer({ storage: storage });
 router.post("/create", upload.array("files"), async (req, res) => {
   try {
@@ -74,8 +70,7 @@ router.post("/create", upload.array("files"), async (req, res) => {
     // 參考https://ithelp.ithome.com.tw/articles/10231435
     activityData["activity_imgs"] = [];
     for (let file of req.files) {
-      let img = fs.readFileSync(file.path);
-      let encode_image = img.toString("base64");
+      let encode_image = Buffer.from(file.buffer).toString("base64");
       activityData["activity_imgs"].push(encode_image);
     }
 
