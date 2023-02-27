@@ -44,4 +44,22 @@ router.post("/likeActivity/:activity_id", async (req, res) => {
     });
   }
 });
+// PUT api/user/updateProfile
+router.put("/updateProfile/", async (req, res) => {
+  try {
+    let { type, value } = req.body;
+    let user_id = req.user._id;
+    const filter = { _id: user_id };
+    const update = {};
+    update[type] = value;
+    await User.findOneAndUpdate(filter, update);
+    res.status(200).send(type + "修改成功!");
+  } catch (err) {
+    res.status(500).send({
+      message: "伺服器內部錯誤!",
+      state: "error",
+      error: err,
+    });
+  }
+});
 module.exports = router;
