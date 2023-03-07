@@ -16,6 +16,7 @@ router.get("/explore", async (req, res) => {
   Activity.find({})
     .populate("creator", ["_id", "username"])
     .then((activities) => {
+      null.qwe;
       res.status(200).send(activities);
     })
     .catch((err) => {
