@@ -16,7 +16,6 @@ router.get("/explore", async (req, res) => {
   Activity.find({})
     .populate("creator", ["_id", "username"])
     .then((activities) => {
-      null.qwe;
       res.status(200).send(activities);
     })
     .catch((err) => {
@@ -59,12 +58,11 @@ router.post("/create", upload.array("files"), async (req, res) => {
     // 驗證標題重複
     let activity = await Activity.findOne({ title: activityData.title });
     if (activity) {
-      throw {
-        expected: true,
-        message: "此活動標題已被使用!",
+      return res.status(400).send({
+        message: "此活動標題已被使用",
         state: "warning",
-        error: "此活動標題已被使用!",
-      };
+        error: "此活動標題已被使用",
+      });
     }
 
     // 將上傳圖片轉成base64編碼
@@ -97,7 +95,7 @@ router.post("/create", upload.array("files"), async (req, res) => {
 router.post("/enroll/:activity_id", async (req, res) => {
   try {
     let { activity_id } = req.params;
-    let { user_id } = req.body;
+    let user_id = req.user._id;
     let activity = await Activity.findOne({ _id: activity_id });
     let user = await User.findOne({ _id: user_id });
 
